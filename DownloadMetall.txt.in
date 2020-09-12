@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 2.8.2)
+
+project(meetall-download NONE)
+
+include(ExternalProject)
+if (METALL_URL)
+    ExternalProject_Add(metall
+            URL ${METALL_URL}
+            SOURCE_DIR        ${METALL_SOURCE_DIR}
+            BINARY_DIR        ${METALL_BUILD_DIR}
+            CMAKE_ARGS        -DINSTALL_HEADER_ONLY=ON -DCMAKE_INSTALL_PREFIX=${METALL_INSTALL_DIR}
+            )
+else ()
+    ExternalProject_Add(metall
+            GIT_REPOSITORY https://github.com/LLNL/metall.git
+            GIT_TAG master
+            SOURCE_DIR        ${METALL_SOURCE_DIR}
+            BINARY_DIR        ${METALL_BUILD_DIR}
+            CMAKE_ARGS        -DINSTALL_HEADER_ONLY=ON -DCMAKE_INSTALL_PREFIX=${METALL_INSTALL_DIR}
+            )
+endif ()

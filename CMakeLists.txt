@@ -41,7 +41,7 @@ find_package( Boost )
 macro(include_link_boost target)
   include_directories(${Boost_INCLUDE_DIRS})
   target_link_libraries(${target} ${Boost_LIBRARIES})
-endmacro() 
+endmacro()
 
 #
 #  stdc++fs is required
@@ -73,14 +73,46 @@ if (METALL_ROOT)
   endif ()
 
   include_directories(${METALL_ROOT}/include)
-endif()
+
+else ()
+  set(METALL_WORK_DIR ${CMAKE_CURRENT_BINARY_DIR}/metall-work)
+  set(METALL_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/metall-src)
+  set(METALL_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/metall-build)
+  set(METALL_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/metall-install)
+
+  configure_file(DownloadMetall.txt.in ${METALL_WORK_DIR}/CMakeLists.txt)
+
+  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+          RESULT_VARIABLE failed
+          WORKING_DIRECTORY ${METALL_WORK_DIR})
+  if (failed)
+    message(FATAL_ERROR "CMake generation step for Metall failed: ${result}")
+  endif ()
+
+  execute_process(COMMAND ${CMAKE_COMMAND} --build .
+          RESULT_VARIABLE failed
+          WORKING_DIRECTORY ${METALL_WORK_DIR})
+  if (failed)
+    message(FATAL_ERROR "CMake build step for Metall failed: ${result}")
+  endif ()
+
+  execute_process(COMMAND ${CMAKE_COMMAND} --install .
+          RESULT_VARIABLE failed
+          WORKING_DIRECTORY ${METALL_WORK_DIR})
+  if (failed)
+    message(FATAL_ERROR "CMake install step for Metall failed: ${result}")
+  endif ()
+
+  include_directories(${METALL_INSTALL_DIR}/include)
+
+endif ()
 
 #
 # Doxygen
 #
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in
                ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
 add_custom_target(doc
     ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
@@ -115,7 +147,7 @@ message("   MPI_FOUND:          ${MPI_FOUND}")
 #message("   DOXYGEN_FOUND:      ${DOXYGEN_FOUND}")
 #MPI params found
 if(MPI_FOUND)
-  message("   MPIEXEC: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} PROCS 
+  message("   MPIEXEC: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} PROCS
           ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
 endif(MPI_FOUND)
 
