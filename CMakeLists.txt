@@ -34,5 +34,5 @@ endfunction()
 add_exe(create_graph_metall)
 add_exe(st_path_metall)
 
-#add_exe(create_graph_metall_int_id)
-#add_exe(st_path_metall_int_id)
+add_exe(create_graph_metall_int_id)
+add_exe(st_path_metall_int_id)
